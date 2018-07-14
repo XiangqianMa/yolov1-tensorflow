@@ -1,9 +1,13 @@
 # 数据集信息
-data_path =
-CLASSES = ''
+data_path = "/home/mxq/graduation_project/pascal_voc/data/pascal_voc/VOCdevkit/VOC2007"
+CLASSES = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
+           'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse',
+           'motorbike', 'person', 'pottedplant', 'sheep', 'sofa',
+           'train', 'tvmonitor']
+TFRecord_PATH = "/home/mxq/Project/object_detection/yolov1/data/TFRecord"
 
 # 样本参数
-CLASS_NUM = 3
+CLASS_NUM = 20
 IMAGE_SIZE = 448
 IMAGE_CHANNELS = 3
 # 输出向量参数
