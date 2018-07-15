@@ -38,7 +38,7 @@ def parse_batch_size_examples(file_name):
     :return: 解析得到的batch_size个样本
     """
     batch_size = para.batch_size
-    min_after_dequeue = 10
+    min_after_dequeue = 1000
     num_threads = 3
     capacity = min_after_dequeue + 3 * batch_size
 
@@ -50,29 +50,34 @@ def parse_batch_size_examples(file_name):
                                                       capacity=capacity,
                                                       min_after_dequeue=min_after_dequeue
                                                       )
-
+    # 进行解码
     image_batch = tf.decode_raw(image_batch, tf.float32)
     label_batch = tf.decode_raw(label_batch, tf.float64)
-    print('enen')
+    # 转换为网络输入所要求的形状
+    image_batch = tf.reshape(image_batch, [para.batch_size, para.IMAGE_SIZE, para.IMAGE_SIZE, para.IMAGE_CHANNELS])
+    label_batch = tf.reshape(label_batch, [para.batch_size, para.cell_size, para.cell_size, 4 + 1 + para.CLASS_NUM])
+
     return image_batch, label_batch
 
 
-file = 'pascal_voc_train.tfrecords'
-batch_example, batch_label = parse_batch_size_examples(file)
-with tf.Session() as sess:
-
-    init_op = tf.global_variables_initializer()
-    sess.run(init_op)
-
-    coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(coord=coord)
-
-    example, label = sess.run([batch_example, batch_label])
-
-    print(type(batch_example))
-    # cv2.imshow('img', example)
-    # cv2.waitKey(0)
-    # print(type(example))
-
-    coord.clear_stop()
-    coord.join(threads)
+# file = 'pascal_voc_train.tfrecords'
+# batch_example, batch_label = parse_batch_size_examples(file)
+# with tf.Session() as sess:
+#
+#     init_op = tf.global_variables_initializer()
+#     sess.run(init_op)
+#
+#     coord = tf.train.Coordinator()
+#     threads = tf.train.start_queue_runners(coord=coord)
+#     for i in range(1):
+#         example, label = sess.run([batch_example, batch_label])
+#
+#         # cv2.imshow('w', example[0, :, :, :])
+#         # cv2.waitKey(0)
+#         print(np.shape(example), np.shape(label))
+#     # cv2.imshow('img', example)
+#     # cv2.waitKey(0)
+#     # print(type(example))
+#     coord.request_stop()
+#     # coord.clear_stop()
+#     coord.join(threads)

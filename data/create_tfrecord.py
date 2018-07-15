@@ -51,6 +51,7 @@ def create_tfrecord():
             writer.write(example.SerializeToString())
             count += 1
     print("Finish,", count, "samples.")
+    writer.close()
 
 
 create_tfrecord()
