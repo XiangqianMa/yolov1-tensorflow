@@ -13,7 +13,7 @@ IMAGE_CHANNELS = 3
 # 输出向量参数
 
 # 训练参数
-batch_size = 10
+batch_size = 1
 base_learn_rate = 0.001
 max_iteration = 4000
 
