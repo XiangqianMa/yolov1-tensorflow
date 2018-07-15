@@ -1,4 +1,5 @@
 import tensorflow as tf
+import cv2
 import numpy as np
 import os
 import parameter.net_parameter as para
@@ -17,16 +18,39 @@ def _bytes_feature(value):
 
 def create_tfrecord():
     # 创建tfrecord文件
-    # tfrecord_filename = os.path.join(para.TFRecord_PATH, 'pascal_voc_train.tfrecords')
-    # writer = tf.python_io.TFRecordWriter(tfrecord_filename)
+    tfrecord_filename = os.path.join(para.TFRecord_PATH, 'pascal_voc_train.tfrecords')
+    writer = tf.python_io.TFRecordWriter(tfrecord_filename)
 
     # 获取样本名称
     data_path = os.path.join(para.data_path, 'Annotations')
     samples_name = os.listdir(data_path)
 
-    for index in samples_name:
-        index = index.split('.')[0]
-        print(index)
+    count = 0
+    print("Start writing tfrecords.")
+    # 写入tfrecord文件
+    with tf.Session() as sess:
+        for index in samples_name:
+            index = index.split('.')[0]
+            print("Writing sample:", index)
+
+            # 获得当前样本的标定信息
+            label, length = dp.load_pascal_annotation(index)
+            # 转换为字符串
+            label = label.tostring()
+
+            # 获得样本图片
+            img = dp.load_image(index)
+            img = img.tostring()
+
+            example = tf.train.Example(features=tf.train.Features(feature={
+                'img': _bytes_feature(img),
+                'label': _bytes_feature(label)
+                }))
+
+            # 将一个example写入tfrecord文件，首先转换为字符串
+            writer.write(example.SerializeToString())
+            count += 1
+    print("Finish,", count, "samples.")
 
 
 create_tfrecord()

@@ -75,3 +75,5 @@ def load_image(index):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32)
 
     cv2.normalize(img, img, 0, 1, cv2.NORM_MINMAX, -1)
+
+    return img
