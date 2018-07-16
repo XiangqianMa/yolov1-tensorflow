@@ -48,7 +48,7 @@ def calc_iou(boxes1, boxes2):
 def loss_function(predict, annotations):
     """
     predict: 网络输出的预测结果，二维向量，大小为batch_size*(cell_size*cell_size*(5+class_num))
-    annotations: 样本原始标定文件
+    annotations: 转换得到的样本原始标定
     """
     with tf.variable_scope('loss'):
         # 从原始预测矩阵中抽取出三个预测部分
@@ -129,3 +129,18 @@ def loss_function(predict, annotations):
         tf.losses.add_loss(object_loss)
         tf.losses.add_loss(noobject_loss)
         tf.losses.add_loss(coord_loss)
+
+
+def my_loss_function(yolo_out, annotations):
+    """
+    Rewrite the loss_function
+    :param yolo_out: 样本经过yolo网络后输出的原始预测结果
+    :param annotations: 样本的原始标定
+    :return: 样本损失
+    """
+    with tf.variable_scope('loss'):
+
+        # 对网络输出进行解析
+
+
+

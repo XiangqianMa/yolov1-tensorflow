@@ -43,7 +43,6 @@ def parse_batch_size_examples(file_name):
     capacity = min_after_dequeue + 3 * batch_size
 
     image, label = parse_single_example(file_name)
-    print('hello')
     image_batch, label_batch = tf.train.shuffle_batch([image, label],
                                                       batch_size=batch_size,
                                                       num_threads=num_threads,
