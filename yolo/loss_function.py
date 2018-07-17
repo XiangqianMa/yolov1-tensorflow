@@ -79,26 +79,34 @@ def my_loss_function(yolo_out, annotations):
         # 将网络所预测的bbox相对于cell的偏移量转换为bbox的中心坐标在图像中的比例
         offset = np.transpose(np.reshape(np.array([np.arange(para.cell_size)] * para.cell_size * para.box_per_cell),
                                          (para.box_per_cell, para.cell_size, para.cell_size)), (1, 2, 0))
+        # 转换为四维矩阵
         offset = tf.reshape(tf.constant(offset, dtype=tf.float32), [1, para.cell_size, para.cell_size,
                                                                     para.box_per_cell])
+        # 将第０维复制batch_size次
         offset = tf.tile(offset, [para.batch_size, 1, 1, 1])
         offset_tran = tf.transpose(offset, (0, 2, 1, 3))
+        # 将中心坐标转换为比例，bbox的长宽进行平方运算，进行平方的原因在于在损失函数中对长宽进行了开方，因而网络预测的是长宽的开方，
+        # tf.stack的作用为将数组按照某一维进行堆叠．
         predict_bboxs_tran = tf.stack([(predict_bboxs[..., 0] + offset) / para.cell_size,
                                        (predict_bboxs[..., 1] + offset_tran) / para.cell_size,
                                        tf.square(predict_bboxs[..., 2]),
                                        tf.square(predict_bboxs[..., 3])],
                                       axis=-1)
 
+        # 判断每一个cell中的两个边界框的哪一个负责预测该cell中的目标，与cell中的真实边界框的IOU最大的框负责预测当前目标．
         # 计算预测的边界框与真实标定的iou
         iou_predict_truth = calc_iou(predict_bboxs_tran, true_bboxs)
 
         # 算出有目标的框[BATCH_SIZE, CELL_SIZE, CELL_SIZE, BOXES_PER_CELL]
+        # 计算各个cell各自所预测的几个边界框中的IOU的最大值
         object_mask = tf.reduce_max(iou_predict_truth, 3, keep_dims=True)
+        # 首先得出当前cell中负责进行目标预测的框，再与真实的置信度进行点乘，得出真实的包含有目标的cell中负责进行目标预测的框．
         object_mask = tf.cast((iou_predict_truth >= object_mask), tf.float32) * true_confidence
 
         # 没有目标的框 [CELL_SIZE, CELL_SIZE, BOXES_PER_CELL]
         noobject_mask = tf.ones_like(object_mask, dtype=tf.float32) - object_mask
 
+        # 将真实bbox的中心坐标转换为相对于cell_box的偏移比例，对长宽进行开方
         boxes_tran = tf.stack([true_bboxs[..., 0] * para.cell_size - offset,
                                true_bboxs[..., 1] * para.cell_size - offset_tran,
                                tf.sqrt(true_bboxs[..., 2]),
