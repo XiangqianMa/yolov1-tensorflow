@@ -59,24 +59,26 @@ def parse_batch_size_examples(file_name):
     return image_batch, label_batch
 
 
-# file = 'pascal_voc_train.tfrecords'
-# batch_example, batch_label = parse_batch_size_examples(file)
-# with tf.Session() as sess:
-#
-#     init_op = tf.global_variables_initializer()
-#     sess.run(init_op)
-#
-#     coord = tf.train.Coordinator()
-#     threads = tf.train.start_queue_runners(coord=coord)
-#     for i in range(1):
-#         example, label = sess.run([batch_example, batch_label])
-#
-#         # cv2.imshow('w', example[0, :, :, :])
-#         # cv2.waitKey(0)
-#         print(np.shape(example), np.shape(label))
-#     # cv2.imshow('img', example)
-#     # cv2.waitKey(0)
-#     # print(type(example))
-#     coord.request_stop()
-#     # coord.clear_stop()
-#     coord.join(threads)
+if __name__ == '__main__':
+    file = 'pascal_voc_train.tfrecords'
+    batch_example, batch_label = parse_batch_size_examples(file)
+    with tf.Session() as sess:
+
+        init_op = tf.global_variables_initializer()
+        sess.run(init_op)
+
+        coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(coord=coord)
+        for i in range(1):
+            example, label = sess.run([batch_example, batch_label])
+            print(label)
+            print(label.astype(np.float32))
+            # cv2.imshow('w', example[0, :, :, :])
+            # cv2.waitKey(0)
+            print(np.shape(example), np.shape(label))
+        # cv2.imshow('img', example)
+        # cv2.waitKey(0)
+        # print(type(example))
+        coord.request_stop()
+        # coord.clear_stop()
+        coord.join(threads)

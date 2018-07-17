@@ -5,9 +5,17 @@ import parameter.net_parameter as para
 import data.extract_tfrecord as extf
 
 
-# 定义前向传播过程
 # is_training参数用于区分训练还是测试，true为训练．false为测试
 def bulid_networks(image, output_size, alpha, keep_prob, is_training):
+    """
+    定义前向传播过程
+    :param image:待输入的样本图片
+    :param output_size: 网络最终输出向量的大小
+    :param alpha: leaky_relu函数的参数
+    :param keep_prob: drop_out层的参数
+    :param is_training: 区分是否进行训练
+    :return: 网络最终的输出
+    """
     with tf.variable_scope('yolo'):
         with slim.arg_scope([slim.conv2d, slim.fully_connected],
                             # activation_fn=tf.nn.leaky_relu(alpha=alpha),
@@ -69,26 +77,27 @@ def leaky_relu(alpha):
     return op
 
 
-file = 'pascal_voc_train.tfrecords'
-images = tf.placeholder(tf.float32, [None, para.IMAGE_SIZE, para.IMAGE_SIZE, para.IMAGE_CHANNELS])
-output_size = para.cell_size * para.cell_size * (5 * para.box_per_cell + para.CLASS_NUM)
-net_output = bulid_networks(images, output_size, 0.2, 0.5, True)
-batch_example, batch_label = extf.parse_batch_size_examples(file)
+if __name__ == '__main__':
+    file = 'pascal_voc_train.tfrecords'
+    images = tf.placeholder(tf.float32, [None, para.IMAGE_SIZE, para.IMAGE_SIZE, para.IMAGE_CHANNELS])
+    output_size = para.cell_size * para.cell_size * (5 * para.box_per_cell + para.CLASS_NUM)
+    net_output = bulid_networks(images, output_size, 0.2, 0.5, True)
+    batch_example, batch_label = extf.parse_batch_size_examples(file)
 
-with tf.Session() as sess:
-    inital = tf.global_variables_initializer()
-    sess.run(inital)
+    with tf.Session() as sess:
+        inital = tf.global_variables_initializer()
+        sess.run(inital)
 
-    coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(coord=coord)
+        coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(coord=coord)
 
-    example, label = sess.run([batch_example, batch_label])
-    feed_dict = {images: example}
-    output = sess.run(net_output, feed_dict=feed_dict)
+        example, label = sess.run([batch_example, batch_label])
+        feed_dict = {images: example}
+        output = sess.run(net_output, feed_dict=feed_dict)
 
-    print(np.shape(output))
-    coord.request_stop()
-    coord.join(threads)
+        print(np.shape(output))
+        coord.request_stop()
+        coord.join(threads)
 
 
 
