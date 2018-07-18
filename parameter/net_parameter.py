@@ -11,12 +11,15 @@ Tensorboard_PATH = "/home/mxq/Project/object_detection/yolov1/Tensorboard"
 CLASS_NUM = 20
 IMAGE_SIZE = 448
 IMAGE_CHANNELS = 3
+SAMPLES_NUM = 5011
 # 输出向量参数
 
 # 训练参数
 batch_size = 15
 base_learn_rate = 0.01
-max_iteration = 1000
+decay_rate = 0.98
+staircase = True
+max_iteration = 3000
 alpha = 0.6
 keep_prob = 0.85
 summary_iteration = 1

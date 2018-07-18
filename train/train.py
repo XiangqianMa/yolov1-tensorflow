@@ -20,7 +20,6 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
     # 解析得到训练样本以及标定
     batch_example, batch_label = extf.parse_batch_size_examples(tfrecord_file)
 
-    global_step = tf.train.get_global_step()
     # 设置输入占位符
     images = tf.placeholder(tf.float32, [None, para.IMAGE_SIZE, para.IMAGE_SIZE, para.IMAGE_CHANNELS])
     labels = tf.placeholder(tf.float32, [None, para.cell_size, para.cell_size, (5+para.CLASS_NUM)])
@@ -29,8 +28,13 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
     # 得到损失函数
     loss_function.my_loss_function(net_output, labels)
     total_loss = tf.losses.get_total_loss()
+    # 设置指数衰减学习率
+    global_step = tf.train.create_global_step()
+    decay_steps = para.SAMPLES_NUM/para.batch_size
+    learning_rate = tf.train.exponential_decay(base_learning_rate, global_step, decay_steps,
+                                               para.decay_rate, para.staircase)
     # 设置优化器
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate=base_learning_rate)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
     # 设置训练操作
     train_op = slim.learning.create_train_op(total_loss, optimizer, global_step)
 
@@ -48,7 +52,7 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
 
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
-
+        summary_writer.add_graph(sess.graph)
         for iteration in range(max_iteration):
             # 获取样本数据
             example, label = sess.run([batch_example, batch_label])
@@ -58,14 +62,13 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
             # cv2.imshow("img2", example[2])
             # cv2.waitKey(500)
             print("Start training:", iteration, "iter")
-            output, loss = sess.run([total_loss, train_op], feed_dict=feed_dict)
+            loss, current_learning_rate, current_global_step = sess.run([train_op, learning_rate, global_step], feed_dict=feed_dict)
 
             if iteration % para.summary_iteration == 0:
-                tf.summary.scalar('total_loss', loss)
                 summary_str = sess.run(summary_merge)
                 summary_writer.add_summary(summary_str, iteration)
 
-            print(loss)
+            print("Loss is:", loss, "Learning_rate is:", current_learning_rate)
 
         coord.request_stop()
         coord.join(threads)
