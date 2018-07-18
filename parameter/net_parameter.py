@@ -5,6 +5,7 @@ CLASSES = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
            'motorbike', 'person', 'pottedplant', 'sheep', 'sofa',
            'train', 'tvmonitor']
 TFRecord_PATH = "/home/mxq/Project/object_detection/yolov1/data/TFRecord"
+Tensorboard_PATH = "/home/mxq/Project/object_detection/yolov1/Tensorboard"
 
 # 样本参数
 CLASS_NUM = 20
@@ -14,10 +15,11 @@ IMAGE_CHANNELS = 3
 
 # 训练参数
 batch_size = 15
-base_learn_rate = 0.001
-max_iteration = 20
+base_learn_rate = 0.01
+max_iteration = 1000
 alpha = 0.6
-keep_prob = 0.5
+keep_prob = 0.85
+summary_iteration = 1
 
 # 输出结果解析参数
 cell_size = 7
@@ -30,5 +32,5 @@ boundary_confidence = boundary_class_prob + cell_size * cell_size * box_per_cell
 # 损失函数中的权重系数
 class_scale = 1.0
 object_scale = 1.0
-noobject_scale = 1.0
-coord_scale = 1.0
+noobject_scale = 0.5
+coord_scale = 5.0
