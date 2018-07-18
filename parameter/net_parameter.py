@@ -13,9 +13,11 @@ IMAGE_CHANNELS = 3
 # 输出向量参数
 
 # 训练参数
-batch_size = 5
+batch_size = 15
 base_learn_rate = 0.001
-max_iteration = 4000
+max_iteration = 20
+alpha = 0.6
+keep_prob = 0.5
 
 # 输出结果解析参数
 cell_size = 7

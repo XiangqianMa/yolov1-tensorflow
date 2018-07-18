@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import cv2
 
 import data.extract_tfrecord as extf
 import parameter.net_parameter as para
@@ -45,9 +46,23 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
             # 获取样本数据
             example, label = sess.run([batch_example, batch_label])
             feed_dict = {images: example, labels: label.astype(np.float32)}
-
+            cv2.imshow("img", example[0])
+            cv2.imshow("img1", example[1])
+            cv2.imshow("img2", example[2])
+            cv2.waitKey(500)
+            print("Start training:", iteration, "iter")
             output, loss = sess.run([total_loss, train_op], feed_dict=feed_dict)
             print(loss)
 
         coord.request_stop()
         coord.join(threads)
+
+
+if __name__ == '__main__':
+    file = 'pascal_voc_train.tfrecords'
+    max_iter = para.max_iteration
+    base_learning_rate = para.base_learn_rate
+    alpha = para.alpha
+    keep_prob = para.keep_prob
+
+    train(file, max_iter, base_learning_rate, alpha, keep_prob)
