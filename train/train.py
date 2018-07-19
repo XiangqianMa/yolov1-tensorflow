@@ -28,6 +28,7 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
     # 得到损失函数
     loss_function.my_loss_function(net_output, labels)
     total_loss = tf.losses.get_total_loss()
+    tf.summary.scalar('total_loss', total_loss)
     # 设置指数衰减学习率
     global_step = tf.train.create_global_step()
     decay_steps = para.SAMPLES_NUM/para.batch_size
@@ -65,7 +66,7 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
             loss, current_learning_rate, current_global_step = sess.run([train_op, learning_rate, global_step], feed_dict=feed_dict)
 
             if iteration % para.summary_iteration == 0:
-                summary_str = sess.run(summary_merge)
+                summary_str = sess.run(summary_merge, feed_dict=feed_dict)
                 summary_writer.add_summary(summary_str, iteration)
 
             print("Loss is:", loss, "Learning_rate is:", current_learning_rate)

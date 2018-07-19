@@ -142,6 +142,11 @@ def my_loss_function(yolo_out, annotations):
         tf.losses.add_loss(noobject_loss)
         tf.losses.add_loss(coord_loss)
 
+        tf.summary.scalar('class_loss', class_loss)
+        tf.summary.scalar('object_loss', object_loss)
+        tf.summary.scalar('noobject_loss', noobject_loss)
+        tf.summary.scalar('coord_loss', coord_loss)
+
 
 if __name__ == '__main__':
     file = 'pascal_voc_train.tfrecords'
