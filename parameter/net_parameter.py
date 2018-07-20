@@ -6,6 +6,7 @@ CLASSES = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
            'train', 'tvmonitor']
 TFRecord_PATH = "/home/mxq/Project/object_detection/yolov1/data/TFRecord"
 Tensorboard_PATH = "/home/mxq/Project/object_detection/yolov1/Tensorboard"
+TEST_PATH = "/home/mxq/Project/object_detection/yolov1/test/images"
 
 # 样本参数
 CLASS_NUM = 20
@@ -32,6 +33,9 @@ boundary_class_prob = cell_size * cell_size * CLASS_NUM
 # 上一边界到该边界之间为所预测的cell包含目标的置信度，每一个cell两个置信度
 boundary_confidence = boundary_class_prob + cell_size * cell_size * box_per_cell
 
+# 测试参数
+prob_threshold = 0.6
+iou_threshold = 0.5
 # 损失函数中的权重系数
 class_scale = 1.0
 object_scale = 1.0
