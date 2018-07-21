@@ -22,14 +22,15 @@ def test_single_image(img, weight):
 
     cv2.normalize(img, img, 0, 1, cv2.NORM_MINMAX, -1)
 
+    input = tf.placeholder(tf.float32, [None, para.IMAGE_SIZE, para.IMAGE_SIZE, para.IMAGE_CHANNELS])
     output_size = para.cell_size * para.cell_size * (5 * para.box_per_cell + para.CLASS_NUM)
-    logits = yolo.bulid_networks(img, output_size, para.alpha, para.keep_prob, False)
+    logits = yolo.bulid_networks(input, output_size, para.alpha, para.keep_prob, False)
     saver = tf.train.Saver()
     with tf.Session() as sess:
         # sess.run(tf.global_variables_initializer())
         # 加载权重
-        saver.restore(sess, weight)
-        yolo_out = sess.run(logits)
+        saver.restore(sess, tf.train.latest_checkpoint(weight))
+        yolo_out = sess.run(logits, feed_dict={input: img})
         result = interpret_output(yolo_out)
 
         for i in range(len(result)):
@@ -152,8 +153,10 @@ def iou(box1, box2):
 
 
 if __name__ == '__main__':
-    weight = para.SAVE_PATH + 'yolo.ckpt'
-    image = cv2.imread('./images/000120.jpg')
-    cv2.imshow('img', image)
-    cv2.waitKey(0)
+    weight = "/home/mxq/Project/object_detection/yolov1/model"
+    image = cv2.imread('./images/000019.jpg')
+
+    print(weight)
+    test_single_image(image, weight)
+
 

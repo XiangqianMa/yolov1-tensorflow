@@ -25,7 +25,7 @@ max_iteration = 3000
 alpha = 0.6
 keep_prob = 0.85
 summary_iteration = 1
-save_iteration = 10
+save_iteration = 200
 
 # 输出结果解析参数
 cell_size = 7
