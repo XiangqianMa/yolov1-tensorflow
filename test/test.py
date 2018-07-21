@@ -7,10 +7,11 @@ import yolo.yolo_construction as yolo
 import parameter.net_parameter as para
 
 
-def test_single_image(img):
+def test_single_image(img, weight):
     """
     本函数用于对单个样本进行检测
     :param img:待检测样本图片
+    :param weight:权重文件
     :return:
     """
     original_img = img
@@ -23,8 +24,11 @@ def test_single_image(img):
 
     output_size = para.cell_size * para.cell_size * (5 * para.box_per_cell + para.CLASS_NUM)
     logits = yolo.bulid_networks(img, output_size, para.alpha, para.keep_prob, False)
+    saver = tf.train.Saver()
     with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
+        # sess.run(tf.global_variables_initializer())
+        # 加载权重
+        saver.restore(sess, weight)
         yolo_out = sess.run(logits)
         result = interpret_output(yolo_out)
 
@@ -146,4 +150,10 @@ def iou(box1, box2):
 
     return inter / (box1[2] * box1[3] + box2[2] * box2[3] - inter)
 
+
+if __name__ == '__main__':
+    weight = para.SAVE_PATH + 'yolo.ckpt'
+    image = cv2.imread('./images/000120.jpg')
+    cv2.imshow('img', image)
+    cv2.waitKey(0)
 
