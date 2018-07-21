@@ -7,6 +7,7 @@ CLASSES = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
 TFRecord_PATH = "/home/mxq/Project/object_detection/yolov1/data/TFRecord"
 Tensorboard_PATH = "/home/mxq/Project/object_detection/yolov1/Tensorboard"
 TEST_PATH = "/home/mxq/Project/object_detection/yolov1/test/images"
+SAVE_PATH = "/home/mxq/Project/object_detection/yolov1/model/"
 
 # 样本参数
 CLASS_NUM = 20
@@ -24,6 +25,7 @@ max_iteration = 3000
 alpha = 0.6
 keep_prob = 0.85
 summary_iteration = 1
+save_iteration = 10
 
 # 输出结果解析参数
 cell_size = 7

@@ -43,6 +43,10 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
     summary_merge = tf.summary.merge_all()
     summary_writer = tf.summary.FileWriter(tensorboard_file, flush_secs=60)
 
+    # 模型保存
+    save_variable = tf.global_variables()
+    saver = tf.train.Saver(save_variable, max_to_keep=True)
+
     # 配置GPU
     gpu_options = tf.GPUOptions()
     config = tf.ConfigProto(gpu_options=gpu_options)
@@ -68,6 +72,10 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
             if iteration % para.summary_iteration == 0:
                 summary_str = sess.run(summary_merge, feed_dict=feed_dict)
                 summary_writer.add_summary(summary_str, iteration)
+
+            if iteration % para.save_iteration == 0:
+                print('save ckpt')
+                saver.save(sess, para.SAVE_PATH + 'yolov1.ckpt', global_step=iteration)
 
             print("Loss is:", loss, "Learning_rate is:", current_learning_rate)
 
