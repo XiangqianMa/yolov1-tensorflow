@@ -23,15 +23,20 @@ def test_single_image(img, weight):
     cv2.normalize(img, img, 0, 1, cv2.NORM_MINMAX, -1)
 
     input = tf.placeholder(tf.float32, [None, para.IMAGE_SIZE, para.IMAGE_SIZE, para.IMAGE_CHANNELS])
+    batch_image = np.zeros([1, para.IMAGE_SIZE, para.IMAGE_SIZE, para.IMAGE_CHANNELS])
+    batch_image[0, :, :, :] = img
+    # cv2.imshow('i', batch_image[0, ...])
+    # cv2.waitKey(0)
     output_size = para.cell_size * para.cell_size * (5 * para.box_per_cell + para.CLASS_NUM)
     logits = yolo.bulid_networks(input, output_size, para.alpha, para.keep_prob, False)
     saver = tf.train.Saver()
     with tf.Session() as sess:
-        # sess.run(tf.global_variables_initializer())
+        sess.run(tf.global_variables_initializer())
         # 加载权重
         saver.restore(sess, tf.train.latest_checkpoint(weight))
-        yolo_out = sess.run(logits, feed_dict={input: img})
-        result = interpret_output(yolo_out)
+
+        yolo_out = sess.run(logits, feed_dict={input: batch_image})
+        result = interpret_output(yolo_out[0])
 
         for i in range(len(result)):
             result[i][1] *= (1.0 * img_w / para.IMAGE_SIZE)
@@ -63,15 +68,15 @@ def interpret_output(yolo_out):
     :param:yolo_out:网络的原始输出
     :return: 检测出的结果[box_num, x, y, w, h, prob]
     """
-    # 解析出类别概率，这里有个需要注意的细节问题，要使用tf.reshape()，而不是np.reshape．
+    # 解析出类别概率，这里有个需要注意的细节问题，要使用np.reshape()，而不是tf.reshape．
     predict_class_prob = yolo_out[0:para.boundary_class_prob]
-    predict_class_prob = tf.reshape(predict_class_prob, [para.cell_size, para.cell_size, para.CLASS_NUM])
+    predict_class_prob = np.reshape(predict_class_prob, [para.cell_size, para.cell_size, para.CLASS_NUM])
     # 解析出是否存在目标的置信度
     predict_confidence = yolo_out[para.boundary_class_prob:para.boundary_confidence]
-    predict_confidence = tf.reshape(predict_confidence, [para.cell_size, para.cell_size, para.box_per_cell])
+    predict_confidence = np.reshape(predict_confidence, [para.cell_size, para.cell_size, para.box_per_cell])
     # 解析出bounding_box的参数信息，网络预测的bbox的中心坐标是相对于cell的偏移量
     predict_bboxs = yolo_out[para.boundary_confidence:]
-    predict_bboxs = tf.reshape(predict_bboxs, [para.cell_size, para.cell_size, para.box_per_cell, 4])
+    predict_bboxs = np.reshape(predict_bboxs, [para.cell_size, para.cell_size, para.box_per_cell, 4])
 
     # 将网络所预测的bbox相对于cell的偏移量转换为bbox的中心坐标在图像中的比例
     offset = np.array([np.arange(para.cell_size)] * para.cell_size * para.box_per_cell)
