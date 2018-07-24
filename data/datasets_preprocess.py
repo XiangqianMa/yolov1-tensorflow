@@ -52,6 +52,7 @@ def load_pascal_annotation(index):
         x_ind = int(boxes[0] * para.cell_size / para.IMAGE_SIZE)
         y_ind = int(boxes[1] * para.cell_size / para.IMAGE_SIZE)
         # 若(x_ind, y_ind)cell已经标定为存在object,则不写入标定信息，也就是说每一个cell只检测一种目标
+        # 这里的x, y坐标是交换的，原因在于numpy的索引和图像的索引是颠倒的，在图像中０维索引列，１维索引行
         if label[y_ind, x_ind, 0] == 1:
             continue
         # 向(x_ind, y_ind)依次写入是否存在object(对应预测值中的边界框预测置信度)， boxes信息， 类别信息，标定信息的写入顺序要和预测值中

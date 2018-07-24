@@ -73,6 +73,7 @@ if __name__ == '__main__':
             example, label = sess.run([batch_example, batch_label])
             print(label)
             print(label.astype(np.float32))
+            box = label[0, ]
             # cv2.imshow('w', example[0, :, :, :])
             # cv2.waitKey(0)
             print(np.shape(example), np.shape(label))
