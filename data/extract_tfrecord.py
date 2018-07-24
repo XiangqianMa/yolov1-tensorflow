@@ -38,7 +38,7 @@ def parse_batch_size_examples(file_name):
     :return: 解析得到的batch_size个样本
     """
     batch_size = para.batch_size
-    min_after_dequeue = 1000
+    min_after_dequeue = 100
     num_threads = 3
     capacity = min_after_dequeue + 3 * batch_size
 

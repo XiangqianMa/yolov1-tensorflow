@@ -37,7 +37,8 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
     # 设置优化器
     optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
     # 设置训练操作
-    train_op = slim.learning.create_train_op(total_loss, optimizer, global_step)
+    # train_op = slim.learning.create_train_op(total_loss, optimizer, global_step)
+    train_op = optimizer.minimize(total_loss, global_step=global_step)
 
     # 配置tensorboard
     summary_merge = tf.summary.merge_all()
@@ -48,7 +49,7 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
     saver = tf.train.Saver(save_variable, max_to_keep=True)
 
     # 配置GPU
-    gpu_options = tf.GPUOptions()
+    gpu_options = tf.GPUOptions(allow_growth=True)
     config = tf.ConfigProto(gpu_options=gpu_options)
 
     with tf.Session(config=config) as sess:
@@ -58,7 +59,7 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
         summary_writer.add_graph(sess.graph)
-        for iteration in range(max_iteration):
+        for iteration in range(max_iteration-1):
             # 获取样本数据
             example, label = sess.run([batch_example, batch_label])
             feed_dict = {images: example, labels: label.astype(np.float32)}
@@ -66,18 +67,19 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
             # cv2.imshow("img1", example[1])
             # cv2.imshow("img2", example[2])
             # cv2.waitKey(500)
-            print("Start training:", iteration, "iter")
-            loss, current_learning_rate, current_global_step = sess.run([train_op, learning_rate, global_step], feed_dict=feed_dict)
+            print("Start training:", iteration+1, "iter")
 
-            if iteration % para.summary_iteration == 0:
+            _, loss, current_learning_rate, current_global_step = sess.run([train_op, total_loss, learning_rate, global_step], feed_dict=feed_dict)
+
+            if iteration+1 % para.summary_iteration == 0:
                 summary_str = sess.run(summary_merge, feed_dict=feed_dict)
                 summary_writer.add_summary(summary_str, iteration)
 
-            if iteration % para.save_iteration == 0:
+            if iteration+1 % para.save_iteration == 0:
                 print('save ckpt')
-                saver.save(sess, para.SAVE_PATH + 'yolov1.ckpt', global_step=iteration)
+                saver.save(sess, para.SAVE_PATH + 'yolov1.ckpt', global_step=current_global_step)
 
-            print("Loss is:", loss, "Learning_rate is:", current_learning_rate)
+            print("Global_step", current_global_step, "Loss is:", loss, "Learning_rate is:", current_learning_rate)
 
         coord.request_stop()
         coord.join(threads)

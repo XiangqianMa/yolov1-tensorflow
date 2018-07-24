@@ -21,7 +21,7 @@ def bulid_networks(image, output_size, alpha, keep_prob, is_training):
                             # activation_fn=tf.nn.leaky_relu(alpha=alpha),
                             activation_fn=leaky_relu(alpha),
                             weights_regularizer=slim.l2_regularizer(0.0005),
-                            weights_initializer=tf.truncated_normal_initializer(0.0, 0.01)
+                            weights_initializer=tf.truncated_normal_initializer(mean=0.0, stddev=0.01)
                             ):
             net = slim.conv2d(image, 64, 7, 2, padding='SAME', scope='conv_1')
             net = slim.max_pool2d(net, 2, 2, padding='SAME', scope='pooling_2')

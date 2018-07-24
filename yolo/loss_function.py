@@ -93,7 +93,7 @@ def my_loss_function(yolo_out, annotations):
                                        tf.square(predict_bboxs[..., 3])],
                                       axis=-1)
 
-        # 判断每一个cell中的两个边界框的哪一个负责预测该cell中的目标，与cell中的真实边界框的IOU最大的框负责预测当前目标．
+        # 判断每一个cell中的两个边界框的哪一个负责预测该cell中的目标，与cell中的真实边界框的IOU最大的框负责预测cell．
         # 计算预测的边界框与真实标定的iou
         iou_predict_truth = calc_iou(predict_bboxs_tran, true_bboxs)
 
@@ -118,19 +118,19 @@ def my_loss_function(yolo_out, annotations):
                                                   axis=[1, 2, 3]),
                                     name='class_loss') * para.class_scale
 
-        # object_loss
+        # object_loss，实际存在目标的框的置信度损失
         object_delta = object_mask * (predict_confidence - iou_predict_truth)
         object_loss = tf.reduce_mean(tf.reduce_sum(tf.square(object_delta),
                                                    axis=[1, 2, 3]),
                                      name='object_loss') * para.object_scale
 
-        # noobject_loss
+        # noobject_loss，实际不存在目标的框的置信度损失
         noobject_delta = noobject_mask * predict_confidence
         noobject_loss = tf.reduce_mean(tf.reduce_sum(tf.square(noobject_delta),
                                                      axis=[1, 2, 3]),
                                        name='noobject_loss') * para.noobject_scale
 
-        # coord_loss
+        # coord_loss，只有当当前预测框负责当前cell的目标预测时，才计算坐标损失．
         coord_mask = tf.expand_dims(object_mask, 4)
         boxes_delta = coord_mask * (predict_bboxs - boxes_tran)
         coord_loss = tf.reduce_mean(tf.reduce_sum(tf.square(boxes_delta),

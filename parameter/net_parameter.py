@@ -18,13 +18,13 @@ SAMPLES_NUM = 5011
 
 # 训练参数
 batch_size = 15
-base_learn_rate = 0.01
+base_learn_rate = 0.001
 decay_rate = 0.98
 staircase = True
-max_iteration = 3000
+max_iteration = 10000
 alpha = 0.6
 keep_prob = 0.85
-summary_iteration = 1
+summary_iteration = 5
 save_iteration = 200
 
 # 输出结果解析参数
