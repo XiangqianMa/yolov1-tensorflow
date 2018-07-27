@@ -13,7 +13,7 @@ def load_pascal_annotation(index):
     """
     对单个xml文件进行解析
     函数的输入为单个图片样本对应的标定文件
-    输出为该图片样本对应的label矩阵，label为三维矩阵[cell_size, cell_size, 5],其中第三维的存储内容为　
+    输出为该图片样本对应的label矩阵，label为三维矩阵[cell_size, cell_size, 5 + 20],其中第三维的存储内容为　
     (confidence, x, y, w, h, 20维向量):
         confidence取值方法为:当前单元格包含目标则为１，不包含目标为０；
         (x, y, w, h)为box的形状信息，中心坐标，宽，高，均以像素坐标的形式给出

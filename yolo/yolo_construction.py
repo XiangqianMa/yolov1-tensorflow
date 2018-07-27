@@ -60,6 +60,7 @@ def bulid_networks(image, output_size, alpha, keep_prob, is_training):
             net = slim.conv2d(net, 1024, 3, 1, padding='SAME', scope='conv_27')
             net = slim.conv2d(net, 1024, 3, 1, padding='SAME', scope='conv_28')
             # 7x7x1024
+
             # 将上一层输出的张量展平为一维向量［image_size*image_size*image_channels］
             net = slim.flatten(net, scope='flat_29')
             net = slim.fully_connected(net, 4096, scope='fc_30')
