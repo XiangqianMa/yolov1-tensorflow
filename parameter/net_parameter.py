@@ -17,13 +17,13 @@ SAMPLES_NUM = 5011
 # 输出向量参数
 
 # 训练参数
-batch_size = 15
-base_learn_rate = 0.001
-decay_rate = 0.98
+batch_size = 30
+base_learn_rate = 0.0005
+decay_rate = 0.0005
 staircase = True
 max_iteration = 10000
 alpha = 0.6
-keep_prob = 0.85
+keep_prob = 1.0
 summary_iteration = 5
 save_iteration = 200
 
@@ -38,6 +38,7 @@ boundary_confidence = boundary_class_prob + cell_size * cell_size * box_per_cell
 # 测试参数
 prob_threshold = 0.6
 iou_threshold = 0.5
+
 # 损失函数中的权重系数
 class_scale = 1.0
 object_scale = 1.0

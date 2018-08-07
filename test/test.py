@@ -87,6 +87,7 @@ def interpret_output(yolo_out):
         (1, 2, 0))
 
     # 将中心坐标和宽，长转换为真实的像素值
+    # 首先将偏移量形式的中心坐标和平方根形式的宽高转换为比例形式
     predict_bboxs[:, :, :, 0] += offset
     predict_bboxs[:, :, :, 1] += np.transpose(offset, (1, 0, 2))
     predict_bboxs[:, :, :, :2] = 1.0 * predict_bboxs[:, :, :, 0:2] / para.cell_size
@@ -100,7 +101,7 @@ def interpret_output(yolo_out):
         for class_n in range(para.CLASS_NUM):
             prob[:, :, box, class_n] = predict_confidence[:, :, box] * predict_class_prob[:, :, class_n]
 
-    # 依据概率和阈值进行过滤
+    # 首先低于概率阈值的将被置为０
     filter_probs = np.array(prob >= para.prob_threshold, dtype='bool')
     filter_boxes = np.nonzero(filter_probs)
 

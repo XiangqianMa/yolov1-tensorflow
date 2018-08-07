@@ -16,13 +16,13 @@ def bulid_tiny_yolo_networks(image, output_size, alpha, keep_prob, is_training):
     :param is_training: 区分是否进行训练
     :return: 网络最终的输出
     """
-    with tf.variable_scope('yolo'):
+    with tf.variable_scope('tiny_yolo'):
         with slim.arg_scope([slim.conv2d, slim.fully_connected],
                             activation_fn=leaky_relu(alpha),
                             weights_regularizer=slim.l2_regularizer(0.0005),
                             weights_initializer=tf.truncated_normal_initializer(mean=0.0, stddev=0.01)
                             ):
-            net = slim.conv2d(image, 16, 3, 1, padding='SAME', scope='conv_1')
+            net = slim.conv2d(image, 16, 3, 2, padding='SAME', scope='conv_1')
             # 224x224x16
             net = slim.max_pool2d(net, 2, 2, padding='SAME', scope='pooling_2')
             # 112x112x16

@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.contrib import slim
 import numpy as np
 import cv2
 import os
@@ -7,8 +8,8 @@ from datetime import datetime
 import data.extract_tfrecord as extf
 import parameter.net_parameter as para
 import yolo.yolo_construction as yolo
+import yolo.tiny_yolo_construction as tiny_yolo
 
-from tensorflow.contrib import slim
 from yolo import loss_function
 
 
@@ -24,7 +25,8 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
     images = tf.placeholder(tf.float32, [None, para.IMAGE_SIZE, para.IMAGE_SIZE, para.IMAGE_CHANNELS])
     labels = tf.placeholder(tf.float32, [None, para.cell_size, para.cell_size, (5+para.CLASS_NUM)])
     # 构建yolo网络
-    net_output = yolo.bulid_networks(images, output_size, alpha, keep_prob, is_training)
+    # net_output = yolo.bulid_networks(images, output_size, alpha, keep_prob, is_training)
+    net_output = tiny_yolo.bulid_tiny_yolo_networks(images, output_size, alpha, keep_prob, is_training)
     # 得到损失函数
     loss_function.my_loss_function(net_output, labels)
     total_loss = tf.losses.get_total_loss()
@@ -36,6 +38,7 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
                                                para.decay_rate, para.staircase)
     # 设置优化器
     optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+    # optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate, momentum=0.9)
     # 设置训练操作
     # train_op = slim.learning.create_train_op(total_loss, optimizer, global_step)
     train_op = optimizer.minimize(total_loss, global_step=global_step)
@@ -71,9 +74,9 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
 
             _, loss, current_learning_rate, current_global_step = sess.run([train_op, total_loss, learning_rate, global_step], feed_dict=feed_dict)
 
-            if iteration+1 % para.summary_iteration == 0:
+            if iteration % para.summary_iteration == 0:
                 summary_str = sess.run(summary_merge, feed_dict=feed_dict)
-                summary_writer.add_summary(summary_str, iteration)
+                summary_writer.add_summary(summary_str, global_step=iteration)
 
             if iteration+1 % para.save_iteration == 0:
                 print('save ckpt')
