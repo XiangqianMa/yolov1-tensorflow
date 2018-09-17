@@ -89,7 +89,8 @@ def train(tfrecord_file, max_iteration, base_learning_rate, alpha, keep_prob):
 
 
 if __name__ == '__main__':
-    file = 'pascal_voc_train.tfrecords'
+    # file = 'pascal_voc_train.tfrecords'
+    file = 'pascal_voc_2012_train.tfrecords'
     max_iter = para.max_iteration
     base_learning_rate = para.base_learn_rate
     alpha = para.alpha
